@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>My Movies</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <ul>
+            {% for movie in movies %}
+            <li>
+                <div class="movie">
+                    <h2><a href="{{movie.id}}">{{ movie.title }} </a></h2>
+                    <p>{{ movie.year }}</p>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>
