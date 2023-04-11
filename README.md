@@ -267,3 +267,109 @@ We can now add links to movies.html file
     </body>
 </html>
 ```
+
+###### Create a form to add movie
+
+-   add a new path to urls.py to create movie
+
+```py
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("", views.home),
+    path("movies/", views.movies),
+    path("movies/<int:movie_id>", views.detail),
+    path("movies/add", views.add),
+]
+```
+
+-   add a add function on views.py
+
+```py
+def add(request):
+    return render(request, "movies/add.html")
+```
+
+-   create a form in add.html
+
+```html
+<form action="/movies/add" method="post">
+    {% csrf_token %}
+    <input type="text" name="title" id="title" placeholder="Title" />
+    <input type="text" name="year" id="year" placeholder="year" />
+    <input type="submit" value="Add Movie" />
+</form>
+```
+
+-   change add method inside views to this
+
+```py
+def add(request):
+    title = request.POST.get("title")
+    year = request.POST.get("year")
+    if title and year:
+        movie = Movie(title=title, year=year)
+        movie.save()
+        return HttpResponseRedirect("/movies")
+
+    return render(request, "movies/add.html")
+```
+
+###### Delete a single movie
+
+-   Change details.html to
+
+```py
+<p>{{movie.title}} - {{movie.year}}</p>
+
+<a href="/movies/delete/{{movie.id}}">Delete</a>
+```
+
+-   Add a path to urls.py
+
+```py
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("", views.home),
+    path("movies/", views.movies),
+    path("movies/<int:movie_id>", views.detail),
+    path("movies/add", views.add),
+    path("movies/delete/<int:movie_id>", views.delete),
+]
+```
+
+add delete function in views.py
+
+```py
+
+def delete(request, movie_id):
+    movie = Movie.objects.get(pk=movie_id)
+    movie.delete()
+    return HttpResponseRedirect("/movies")
+```
+
+###### Add 404
+
+-   use try catch block inside delete function
+
+```py
+
+def delete(request, movie_id):
+    try:
+        movie = Movie.objects.get(pk=movie_id)
+    except:
+        raise Http404("Movie does not exist")
+    movie.delete()
+    return HttpResponseRedirect("/movies")
+```
+
+###### Change Debug to false
+
+-   in settings.py
+
+```py
+DEBUG = False
+
+ALLOWED_HOSTS = ["127.0.0.1"]
+```
+
+and re start the server
